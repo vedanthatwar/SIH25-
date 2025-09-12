@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Hardware Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="sih25.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-4 sm:p-8">
+
+    <!-- Main Dashboard Container -->
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col mb-8 p-6 bg-gray-800 rounded-2xl shadow-xl">
+            <!-- Top Bar with Logo and Status -->
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <div class="h-12 w-12 rounded-full bg-indigo-500 flex items-center justify-center text-white text-2xl mr-4 font-bold">🛠️</div>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-gray-100">Project Data Stream</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-400 text-sm">Status:</span>
+                    <span id="status-indicator" class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span id="last-updated" class="text-gray-400 text-sm"></span>
+                </div>
+            </div>
+
+            <!-- Responsive Navigation Menu -->
+            <nav class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                <div class="flex sm:hidden justify-end">
+                    <button id="menu-toggle" class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="mobile-menu" class="hidden sm:flex flex-col sm:flex-row sm:space-x-8 space-y-2 sm:space-y-0 mt-4 sm:mt-0 items-start sm:items-center">
+                    <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-200">Dashboard</a>
+                    <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-200">Logs</a>
+                    <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-200">Settings</a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Metrics Cards Section -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Metric Card 1: Temperature -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105 border-t-4 border-t-indigo-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-300">Temperature</h2>
+                    <span class="text-3xl">🌡️</span>
+                </div>
+                <div class="text-4xl font-bold text-white">
+                    <span id="temp-value">--</span><span class="text-xl ml-1 text-gray-400">&deg;C</span>
+                </div>
+            </div>
+
+            <!-- Metric Card 2: Humidity -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105 border-t-4 border-t-sky-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-300">Humidity</h2>
+                    <span class="text-3xl">💧</span>
+                </div>
+                <div class="text-4xl font-bold text-white">
+                    <span id="hum-value">--</span><span class="text-xl ml-1 text-gray-400">%</span>
+                </div>
+            </div>
+
+            <!-- Metric Card 3: Pressure -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105 border-t-4 border-t-emerald-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-300">Pressure</h2>
+                    <span class="text-3xl">💨</span>
+                </div>
+                <div class="text-4xl font-bold text-white">
+                    <span id="pressure-value">--</span><span class="text-xl ml-1 text-gray-400">hPa</span>
+                </div>
+            </div>
+
+            <!-- Metric Card 4: Last Ping -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105 border-t-4 border-t-rose-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-300">Last Ping</h2>
+                    <span class="text-3xl">⚡</span>
+                </div>
+                <div class="text-4xl font-bold text-white">
+                    <span id="ping-value">--</span><span class="text-xl ml-1 text-gray-400">ms</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Chart Section -->
+        <section class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-100 mb-4">
+                Data History
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative h-96">
+                <div class="relative h-64 lg:h-96">
+                    <h3 class="absolute top-0 left-0 text-sm font-medium text-gray-400 z-10 p-2">Temperature (&deg;C)</h3>
+                    <canvas id="tempChartCanvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="relative h-64 lg:h-96">
+                    <h3 class="absolute top-0 left-0 text-sm font-medium text-gray-400 z-10 p-2">Humidity (%)</h3>
+                    <canvas id="humChartCanvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="relative h-64 lg:h-96">
+                    <h3 class="absolute top-0 left-0 text-sm font-medium text-gray-400 z-10 p-2">Pressure (hPa)</h3>
+                    <canvas id="pressureChartCanvas" class="w-full h-full"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls and Data Section -->
+        <section class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-100 mb-4">
+                Control Panel
+            </h2>
+            <div class="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0">
+                <button id="simulate-btn" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-300">
+                    Simulate Live Data
+                </button>
+                <button id="clear-btn" class="w-full sm:w-auto px-6 py-3 bg-slate-700 text-gray-200 rounded-lg font-semibold hover:bg-slate-600 transition-colors duration-300">
+                    Clear Data
+                </button>
+                <button id="download-btn" class="w-full sm:w-auto px-6 py-3 bg-slate-700 text-gray-200 rounded-lg font-semibold hover:bg-slate-600 transition-colors duration-300">
+                    Download Data as JSON
+                </button>
+            </div>
+            <div class="mt-6 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <label for="speed-slider" class="text-sm font-medium text-gray-300">Simulation Speed:</label>
+                <input type="range" id="speed-slider" min="500" max="5000" value="2000" class="w-full sm:w-64 accent-indigo-500">
+                <span id="speed-value" class="text-sm text-gray-400">2.0s</span>
+            </div>
+        </section>
+
+        <!-- Team and Contact Section -->
+        <section id="team-contact" class="bg-gray-800 p-6 rounded-2xl shadow-lg mt-8">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-100 mb-4">
+                Team & Contact
+            </h2>
+            <p class="text-gray-400 mb-6">
+                This project was developed for a hackathon. We are passionate about creating innovative hardware and software solutions.
+            </p>
+            <div class="flex items-center space-x-6">
+                <!-- LinkedIn -->
+                <a href="https://www.linkedin.com" target="_blank" class="text-gray-400 hover:text-indigo-400 transition-colors duration-200">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <!-- GitHub -->
+                <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-indigo-400 transition-colors duration-200">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.809 1.309 3.492.997.108-.776.418-1.309.762-1.605-2.665-.304-5.467-1.334-5.467-5.931 0-1.311.465-2.381 1.236-3.221-.124-.303-.535-1.524.118-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.046.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.6.8.576 4.765-1.589 8.204-6.086 8.204-11.387c0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+                <!-- Email -->
+                <a href="mailto:contact@example.com" class="text-gray-400 hover:text-indigo-400 transition-colors duration-200">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 6c0-1.103-.897-2-2-2h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2v-12zm-2.126 1.666l-7.874 7.534-7.874-7.534h15.748zm.126 10.334h-16c-.056 0-.109-.009-.162-.023l8.162-7.837 8.162 7.837c-.053.014-.106.023-.162.023z"/></svg>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="message-modal" class="fixed inset-x-0 bottom-4 flex justify-center items-center pointer-events-none p-4 opacity-0 transition-opacity duration-300">
+        <div id="message-content" class="rounded-lg shadow-xl p-4 text-center font-medium transform translate-y-full transition-transform duration-300 ease-out"></div>
+    </div>
+    <script src="sih25.js"></script>
+</body>
+</html>
